@@ -23,10 +23,10 @@ def render_el(value, tag):
     return '<{tag}>{value}</{tag}>'.format(value=value, tag=tag)
 
 
-def render_obj(obj):
+def render_obj(obj, key_tag=None):
     res = ''
     for (key, val) in obj.items():
-        res += render_el(val, TAGS_RENDER_DEFAULT[key])
+        res += render_el(val, key if key_tag else TAGS_RENDER_DEFAULT[key])
     return res
 
 
@@ -34,9 +34,9 @@ def render_html(source):
     res = ''
     if isinstance(source, list):
         for o in source:
-            res += render_obj(o)
+            res += render_obj(o, key_tag=True)
     else:
-        res += render_obj(source)
+        res += render_obj(source, key_tag=True)
     print(res)
 
 
