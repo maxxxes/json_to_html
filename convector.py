@@ -20,6 +20,8 @@ TAGS_RENDER_DEFAULT = {
 
 
 def render_el(value, tag):
+    if isinstance(value, list):
+        value = render_objects(value)
     return '<{tag}>{value}</{tag}>'.format(value=value, tag=tag)
 
 
@@ -35,7 +37,6 @@ def render_ul_decorator(func):
     return func_wrapper
 
 
-@render_li_decorator
 def render_obj(obj, key_tag=None):
     return ''.join(
         render_el(val, key if key_tag else TAGS_RENDER_DEFAULT[key])
@@ -46,23 +47,22 @@ def render_obj(obj, key_tag=None):
 @render_ul_decorator
 def render_objects(source):
     return ''.join(
-        render_obj(o, key_tag=True)
-        for o in source
+        render_li_decorator(render_obj)(obj, key_tag=True)
+        for obj in source
     )
 
 
 def render_html(source):
     if isinstance(source, list):
-        res = render_objects(source)
-    else:
-        res = render_obj(source, key_tag=True)
-    print(res)
+        return render_objects(source)
+    return render_obj(source, key_tag=True)
 
 
 def main():
     with open('source.json') as json_file, JsonLoads():
         source = json.loads(json_file.read(), object_pairs_hook=OrderedDict)
-        render_html(source)
+        print(render_html(source))
+
 
 if __name__ == '__main__':
     main()
