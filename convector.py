@@ -23,20 +23,39 @@ def render_el(value, tag):
     return '<{tag}>{value}</{tag}>'.format(value=value, tag=tag)
 
 
+def render_li_decorator(func):
+    def func_wrapper(*args, **kwargs):
+        return '<li>' + func(*args, **kwargs) + '</li>'
+    return func_wrapper
+
+
+def render_ul_decorator(func):
+    def func_wrapper(*args, **kwargs):
+        return '<ul>' + func(*args, **kwargs) + '</ul>'
+    return func_wrapper
+
+
+@render_li_decorator
 def render_obj(obj, key_tag=None):
-    res = ''
-    for (key, val) in obj.items():
-        res += render_el(val, key if key_tag else TAGS_RENDER_DEFAULT[key])
-    return res
+    return ''.join(
+        render_el(val, key if key_tag else TAGS_RENDER_DEFAULT[key])
+        for (key, val) in obj.items()
+    )
+
+
+@render_ul_decorator
+def render_objects(source):
+    return ''.join(
+        render_obj(o, key_tag=True)
+        for o in source
+    )
 
 
 def render_html(source):
-    res = ''
     if isinstance(source, list):
-        for o in source:
-            res += render_obj(o, key_tag=True)
+        res = render_objects(source)
     else:
-        res += render_obj(source, key_tag=True)
+        res = render_obj(source, key_tag=True)
     print(res)
 
 
